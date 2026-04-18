@@ -47,6 +47,14 @@ resource "google_container_cluster" "my_cluster" {
 
   min_master_version = var.kubernetes_version
 
+  monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+  }
+
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+  }
+
   ip_allocation_policy {
   }
 
