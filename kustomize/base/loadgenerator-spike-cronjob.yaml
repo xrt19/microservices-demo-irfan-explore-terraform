@@ -1,0 +1,77 @@
+# Scheduled spike test for loadgenerator.
+# - 09:00 WIB: spike to 1000 users
+# - 09:30 WIB: back to 10 users (baseline)
+# Requires RBAC permissions to patch deployments (included below).
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: loadgenerator-spike
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: loadgenerator-spike
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  resourceNames: ["loadgenerator"]
+  verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: loadgenerator-spike
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: loadgenerator-spike
+subjects:
+- kind: ServiceAccount
+  name: loadgenerator-spike
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: loadgenerator-spike-up
+spec:
+  schedule: "0 9 * * *"
+  timeZone: "Asia/Jakarta"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: loadgenerator-spike
+          restartPolicy: Never
+          containers:
+          - name: spike-up
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl patch deployment loadgenerator --type=json \
+                -p='[{"op":"replace","path":"/spec/template/spec/containers/0/env/1","value":{"name":"USERS","value":"1000"}}]'
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: loadgenerator-spike-down
+spec:
+  schedule: "30 9 * * *"
+  timeZone: "Asia/Jakarta"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: loadgenerator-spike
+          restartPolicy: Never
+          containers:
+          - name: spike-down
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl patch deployment loadgenerator --type=json \
+                -p='[{"op":"replace","path":"/spec/template/spec/containers/0/env/1","value":{"name":"USERS","value":"10"}}]'

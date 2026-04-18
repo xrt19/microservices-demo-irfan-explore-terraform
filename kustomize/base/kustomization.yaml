@@ -22,6 +22,7 @@ resources:
 - emailservice.yaml
 - frontend.yaml
 - loadgenerator.yaml
+- loadgenerator-spike-cronjob.yaml
 - paymentservice.yaml
 - productcatalogservice.yaml
 - recommendationservice.yaml
