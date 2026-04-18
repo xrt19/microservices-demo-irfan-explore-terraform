@@ -84,3 +84,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: productcatalogservice
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: productcatalogservice-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: productcatalogservice

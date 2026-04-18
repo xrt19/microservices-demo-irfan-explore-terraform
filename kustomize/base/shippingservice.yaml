@@ -84,3 +84,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: shippingservice
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: shippingservice-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: shippingservice

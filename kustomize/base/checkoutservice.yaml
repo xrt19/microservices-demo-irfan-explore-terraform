@@ -93,3 +93,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: checkoutservice
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: checkoutservice-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: checkoutservice
