@@ -108,13 +108,6 @@ spec:
       labels:
         app: redis-cart
     spec:
-      topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: topology.kubernetes.io/zone
-        whenUnsatisfiable: DoNotSchedule
-        labelSelector:
-          matchLabels:
-            app: redis-cart
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -178,6 +171,25 @@ spec:
   selector:
     matchLabels:
       app: cartservice
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cartservice-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cartservice
+  minReplicas: 3
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
