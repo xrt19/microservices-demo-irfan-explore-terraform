@@ -29,6 +29,13 @@ spec:
     spec:
       serviceAccountName: currencyservice
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: currencyservice
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
