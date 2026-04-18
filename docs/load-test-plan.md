@@ -130,7 +130,10 @@ Expected behavior:
 
 | Scenario | USERS | RATE | Started At | Status |
 |----------|:-----:|:----:|------------|--------|
-| 1 — Baseline | 10 | 1 | 2026-04-19 03:30 WIB | Running |
+| 1 — Baseline | 10 | 1 | 2026-04-19 03:30 WIB | Done |
+| 2 — Moderate | 40 | 3 | 2026-04-19 03:45 WIB | Done |
+| 3 — Stress | 100 | 5 | 2026-04-19 03:56 WIB | Done |
+| 4 — Max Capacity | 150 | 10 | 2026-04-19 04:28 WIB | Running |
 
 ### Scenario 1 Notes (sampled ~03:45 WIB)
 
@@ -165,6 +168,77 @@ Expected behavior:
 - Node memory 36–41% — mostly base overhead, not load-driven
 - Zero HPA scale-ups — all services at minReplicas (3)
 - Cluster is comfortably handling USERS=10, RATE=1
+
+### Scenario 2 Notes (sampled ~03:55 WIB)
+
+**Node Utilization:**
+
+| Node | CPU | CPU% | Memory | Mem% |
+|------|-----|:----:|--------|:----:|
+| 5a88a43b-zss3 | 174m | 4% | 1,601Mi | 36% |
+| 7f116bd2-svf2 | 164m | 4% | 1,817Mi | 41% |
+| e766f3e7-20hq | 274m | 6% | 1,820Mi | 41% |
+
+**Service CPU Utilization (HPA target: 70%):**
+
+| Service | CPU/pod (avg) | HPA Actual | Replicas |
+|---------|:-------------:|:----------:|:--------:|
+| frontend | 22m | 22% | 3 |
+| currencyservice | 16m | 13% | 3 |
+| recommendationservice | 12m | 12% | 3 |
+| productcatalogservice | 11m | 12% | 3 |
+| cartservice | 8m | 4% | 3 |
+| emailservice | 3m | 3% | 3 |
+| checkoutservice | 2m | 2% | 3 |
+| adservice | 3m | 1% | 3 |
+| paymentservice | 1m | 1% | 3 |
+| shippingservice | 2m | 2% | 3 |
+| loadgenerator | 16m | — | 1 |
+| redis-cart | 5m | — | 1 |
+
+**Observations:**
+- Frontend highest at 22% CPU — 4x increase from Scenario 1 but still well under HPA threshold
+- currencyservice 13%, productcatalogservice 12%, recommendationservice 12% — moderate increase
+- No HPA scaling triggered — all services still at minReplicas (3)
+- Node CPU 4–6% — still very lightly loaded
+- Node memory unchanged (~36–41%) — confirms memory is not load-driven
+- Cluster handles USERS=40, RATE=3 comfortably without any scaling
+
+### Scenario 3 Notes (sampled ~04:27 WIB)
+
+**Node Utilization:**
+
+| Node | CPU | CPU% | Memory | Mem% |
+|------|-----|:----:|--------|:----:|
+| 5a88a43b-zss3 | 390m | 9% | 1,668Mi | 37% |
+| 7f116bd2-svf2 | 295m | 7% | 1,859Mi | 42% |
+| e766f3e7-20hq | 351m | 8% | 1,787Mi | 40% |
+
+**Service CPU Utilization (HPA target: 70%):**
+
+| Service | CPU/pod (avg) | HPA Actual | Replicas |
+|---------|:-------------:|:----------:|:--------:|
+| frontend | 52m | 56% | 3 |
+| currencyservice | 25m | 26% | 3 |
+| productcatalogservice | 25m | 26% | 3 |
+| recommendationservice | 22m | 23% | 3 |
+| cartservice | 16m | 8% | 3 |
+| adservice | 5m | 3% | 3 |
+| checkoutservice | 3m | 3% | 3 |
+| emailservice | 3m | 3% | 3 |
+| shippingservice | 3m | 3% | 3 |
+| paymentservice | 1m | 1% | 3 |
+| loadgenerator | 38m | — | 1 |
+| redis-cart | 7m | — | 1 |
+
+**Observations:**
+- Frontend at 56% CPU — approaching HPA threshold (70%), close to triggering scale-up
+- currencyservice and productcatalogservice both at 26% — significant increase from Scenario 2
+- recommendationservice at 23% — also climbing
+- Node CPU 7–9% — still moderate headroom
+- Node memory still flat at 37–42% — confirms CPU-bound workload
+- No HPA scaling triggered yet — but frontend is close
+- One frontend pod (tf7zv) at 74m CPU individually — uneven load distribution
 
 ## Recommended Test Sequence
 
