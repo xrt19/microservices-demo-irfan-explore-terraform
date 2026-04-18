@@ -36,16 +36,17 @@ module "enable_google_apis" {
   activate_apis = concat(local.base_apis, var.memorystore ? local.memorystore_apis : [])
 }
 
-# Create GKE cluster
+# Create GKE Standard cluster
 resource "google_container_cluster" "my_cluster" {
 
   name     = var.name
   location = var.region
 
-  # Enable autopilot for this cluster
-  enable_autopilot = true
+  remove_default_node_pool = true
+  initial_node_count       = 1
 
-  # Set an empty ip_allocation_policy to allow autopilot cluster to spin up correctly
+  min_master_version = var.kubernetes_version
+
   ip_allocation_policy {
   }
 
@@ -56,6 +57,32 @@ resource "google_container_cluster" "my_cluster" {
   depends_on = [
     module.enable_google_apis
   ]
+}
+
+# Create node pool — 1 node per zone (3 zones in asia-southeast2 = 3 nodes total)
+resource "google_container_node_pool" "primary_nodes" {
+  name     = "${var.name}-node-pool"
+  location = var.region
+  cluster  = google_container_cluster.my_cluster.name
+
+  version    = var.kubernetes_version
+  node_count = var.node_count_per_zone
+
+  autoscaling {
+    min_node_count = var.min_node_count_per_zone
+    max_node_count = var.max_node_count_per_zone
+  }
+
+  node_config {
+    machine_type = var.machine_type
+    disk_size_gb = var.disk_size_gb
+    disk_type    = var.disk_type
+    image_type   = var.image_type
+
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+  }
 }
 
 # Get credentials for cluster
