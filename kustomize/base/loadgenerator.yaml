@@ -21,7 +21,7 @@ spec:
   selector:
     matchLabels:
       app: loadgenerator
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -32,6 +32,13 @@ spec:
       serviceAccountName: loadgenerator
       terminationGracePeriodSeconds: 5
       restartPolicy: Always
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: loadgenerator
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -82,7 +89,7 @@ spec:
         - name: FRONTEND_ADDR
           value: "frontend:80"
         - name: USERS
-          value: "150"
+          value: "100"
         - name: RATE
           value: "10"
         resources:
@@ -116,3 +123,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: loadgenerator
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: loadgenerator-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: loadgenerator
