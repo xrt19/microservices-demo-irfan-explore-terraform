@@ -240,6 +240,43 @@ Expected behavior:
 - No HPA scaling triggered yet — but frontend is close
 - One frontend pod (tf7zv) at 74m CPU individually — uneven load distribution
 
+### Scenario 4 Notes (sampled ~04:44 WIB)
+
+**Node Utilization:**
+
+| Node | CPU | CPU% | Memory | Mem% |
+|------|-----|:----:|--------|:----:|
+| 5a88a43b-zss3 | 423m | 10% | 1,667Mi | 37% |
+| 7f116bd2-svf2 | 325m | 8% | 1,858Mi | 42% |
+| e766f3e7-20hq | 483m | 12% | 1,787Mi | 40% |
+
+**Service CPU Utilization (HPA target: 70%):**
+
+| Service | CPU/pod (avg) | HPA Actual | Replicas | Scaled? |
+|---------|:-------------:|:----------:|:--------:|:-------:|
+| frontend | 56m | 56% | 4 | YES |
+| currencyservice | 36m | 35% | 3 | no |
+| productcatalogservice | 37m | 37% | 3 | no |
+| recommendationservice | 33m | 33% | 3 | no |
+| cartservice | 24m | 13% | 3 | no |
+| adservice | 7m | 3% | 3 | no |
+| checkoutservice | 4m | 4% | 3 | no |
+| emailservice | 4m | 4% | 3 | no |
+| shippingservice | 4m | 4% | 3 | no |
+| paymentservice | 1m | 2% | 3 | no |
+| loadgenerator | 50m | — | 1 | — |
+| redis-cart | 8m | — | 1 | — |
+
+**Observations:**
+- **Frontend HPA triggered — scaled from 3 to 4 replicas** (first scale-up in all scenarios)
+- Frontend HPA reads 56% after scale-up — load distributed across 4 pods now
+- New pod (9wr8x) just started at 1m CPU — still warming up
+- currencyservice at 35%, productcatalogservice at 37% — climbing but still under threshold
+- Uneven pod load persists: frontend tf7zv at 82m vs n6zpx at 64m
+- recommendationservice rdln7 at 67m vs h8h5w at 2m — extreme imbalance
+- Node CPU 8–12% — still plenty of headroom, no node autoscaler trigger
+- Node memory still flat at 37–42%
+
 ## Recommended Test Sequence
 
 Run scenarios in order, with 5–10 min cooldown between each:
@@ -247,7 +284,7 @@ Run scenarios in order, with 5–10 min cooldown between each:
 1. **Baseline** (USERS=10, RATE=1) — 10 min, confirm zero errors
 2. **Moderate** (USERS=40, RATE=3) — 15 min, confirm HPA works
 3. **Stress** (USERS=100, RATE=5) — 20 min, confirm autoscaler works
-4. **Max** (USERS=150, RATE=5) — 15 min, find breaking point
+4. **Max** (USERS=150, RATE=10) — 15 min, find breaking point
 
 ## How to Run
 
