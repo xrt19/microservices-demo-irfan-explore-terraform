@@ -133,7 +133,11 @@ Expected behavior:
 | 1 — Baseline | 10 | 1 | 2026-04-19 03:30 WIB | Done |
 | 2 — Moderate | 40 | 3 | 2026-04-19 03:45 WIB | Done |
 | 3 — Stress | 100 | 5 | 2026-04-19 03:56 WIB | Done |
-| 4 — Max Capacity | 150 | 10 | 2026-04-19 04:28 WIB | Running |
+| 4 — Max Capacity | 150 | 10 | 2026-04-19 04:28 WIB | Done |
+| 5 — Even Load Retest | 100 | 10 | 2026-04-19 04:51 WIB | Running |
+
+**Scenario 5 config change:** Loadgenerator scaled to 3 replicas (1 per zone) with topology
+spread constraints and PDB to fix uneven load distribution observed in Scenarios 3-4.
 
 ### Scenario 1 Notes (sampled ~03:45 WIB)
 
