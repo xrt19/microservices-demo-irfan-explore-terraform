@@ -167,7 +167,8 @@ spec:
     kind: Deployment
     name: frontend
   minReplicas: 3
-  maxReplicas: 6
+  # Raised from 6: at USERS=100 RATE=10, 6 replicas hit 71% CPU — not enough headroom
+  maxReplicas: 10
   metrics:
   - type: Resource
     resource:
