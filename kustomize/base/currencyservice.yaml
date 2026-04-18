@@ -60,18 +60,25 @@ spec:
         - name: DISABLE_PROFILER
           value: "1"
         readinessProbe:
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 5
           grpc:
             port: 7000
         livenessProbe:
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+          periodSeconds: 15
+          failureThreshold: 5
           grpc:
             port: 7000
         resources:
           requests:
-            cpu: 100m
-            memory: 64Mi
-          limits:
-            cpu: 200m
+            cpu: 250m
             memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
 ---
 apiVersion: v1
 kind: Service
