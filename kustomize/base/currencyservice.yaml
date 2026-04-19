@@ -65,13 +65,13 @@ spec:
         livenessProbe:
           grpc:
             port: 7000
-        # CPU scaled up: max pods reduced 12→5, each pod handles more load. Ratio 1:2.5
+        # CPU sized so 3 pods handle USERS=200 at ~70%: 5×140m×66%=462m → 462/3/0.7=220m. Ratio 1:2.5
         resources:
           requests:
-            cpu: 140m
+            cpu: 220m
             memory: 64Mi
           limits:
-            cpu: 350m
+            cpu: 550m
             memory: 128Mi
 ---
 apiVersion: v1

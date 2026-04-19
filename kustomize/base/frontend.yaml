@@ -104,13 +104,13 @@ spec:
           # As part of an optional Google Cloud demo, you can run an optional microservice called the "packaging service".
           # - name: PACKAGING_SERVICE_URL
           #   value: "" # This value would look like "http://123.123.123"
-          # CPU scaled up: max pods reduced 20→10, each pod handles more load. Ratio 1:2.5
+          # CPU sized so 3 pods handle USERS=200 at ~70%: 10×150m×63%=945m → 945/3/0.7=450m. Ratio 1:2.5
           resources:
             requests:
-              cpu: 150m
+              cpu: 450m
               memory: 64Mi
             limits:
-              cpu: 375m
+              cpu: 1125m
               memory: 128Mi
 ---
 apiVersion: v1

@@ -68,13 +68,13 @@ spec:
           value: "productcatalogservice:3550"
         - name: DISABLE_PROFILER
           value: "1"
-        # CPU scaled up: max pods reduced 10→5, each pod handles more load. Ratio 1:2.5
+        # CPU sized so 3 pods handle USERS=200 at ~70%: 5×120m×66%=396m → 396/3/0.7=190m. Ratio 1:2.5
         resources:
           requests:
-            cpu: 120m
+            cpu: 190m
             memory: 220Mi
           limits:
-            cpu: 300m
+            cpu: 475m
             memory: 450Mi
 ---
 apiVersion: v1
