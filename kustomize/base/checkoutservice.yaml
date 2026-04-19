@@ -122,7 +122,8 @@ spec:
     kind: Deployment
     name: checkoutservice
   minReplicas: 3
-  maxReplicas: 5
+  # Proportional max: orchestrator tier, never scaled beyond 3 at USERS=200
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:

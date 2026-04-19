@@ -182,8 +182,8 @@ spec:
     kind: Deployment
     name: cartservice
   minReplicas: 3
-  # Raised from 5: at 22% now but scales proportionally with frontend traffic
-  maxReplicas: 7
+  # Proportional max: low-middle tier, never scaled beyond 3 at USERS=200
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:

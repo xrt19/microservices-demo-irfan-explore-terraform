@@ -67,10 +67,10 @@ spec:
           periodSeconds: 5
           grpc:
             port: 8080
-        # CPU tuned: actual peak 13m at USERS=200. Limit kept at 200m — Python gRPC needs CPU headroom at startup
+        # CPU tuned: actual peak 13m at USERS=200. Limit 200m — Python gRPC needs CPU headroom at startup
         resources:
           requests:
-            cpu: 30m
+            cpu: 40m
             memory: 64Mi
           limits:
             cpu: 200m
@@ -116,7 +116,8 @@ spec:
     kind: Deployment
     name: emailservice
   minReplicas: 3
-  maxReplicas: 5
+  # Proportional max: leaf tier, never scaled beyond 3 at USERS=200
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:

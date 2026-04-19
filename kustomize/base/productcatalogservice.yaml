@@ -64,12 +64,13 @@ spec:
         livenessProbe:
           grpc:
             port: 3550
+        # CPU scaled up: max pods reduced 10→5, each pod handles more load. Ratio 1:2.5
         resources:
           requests:
-            cpu: 100m
+            cpu: 120m
             memory: 64Mi
           limits:
-            cpu: 200m
+            cpu: 300m
             memory: 128Mi
 ---
 apiVersion: v1
@@ -112,8 +113,8 @@ spec:
     kind: Deployment
     name: productcatalogservice
   minReplicas: 3
-  # Raised from 5→8→10: at USERS=200 RATE=10, 6 replicas at 65% CPU approaching threshold
-  maxReplicas: 10
+  # Proportional max: middle tier. CPU req raised to compensate fewer pods
+  maxReplicas: 5
   metrics:
   - type: Resource
     resource:

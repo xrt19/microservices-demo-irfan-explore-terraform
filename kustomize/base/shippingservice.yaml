@@ -113,8 +113,8 @@ spec:
     kind: Deployment
     name: shippingservice
   minReplicas: 3
-  # Raised from 5→7: CPU request lowered (100m→30m) makes HPA % more sensitive, at 40% already
-  maxReplicas: 7
+  # Proportional max: leaf tier, never scaled beyond 3 at USERS=200
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:

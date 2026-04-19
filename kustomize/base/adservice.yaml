@@ -115,8 +115,8 @@ spec:
     kind: Deployment
     name: adservice
   minReplicas: 3
-  # Raised from 5→8: CPU request halved (200m→100m) makes HPA % more sensitive, maxed at 5 immediately
-  maxReplicas: 8
+  # Proportional max: leaf tier, never scaled beyond 3 at USERS=200
+  maxReplicas: 4
   metrics:
   - type: Resource
     resource:

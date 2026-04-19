@@ -65,12 +65,13 @@ spec:
         livenessProbe:
           grpc:
             port: 7000
+        # CPU scaled up: max pods reduced 12→5, each pod handles more load. Ratio 1:2.5
         resources:
           requests:
-            cpu: 100m
+            cpu: 140m
             memory: 64Mi
           limits:
-            cpu: 200m
+            cpu: 350m
             memory: 128Mi
 ---
 apiVersion: v1
@@ -113,8 +114,8 @@ spec:
     kind: Deployment
     name: currencyservice
   minReplicas: 3
-  # Raised from 6→10→12: at USERS=200 RATE=10, 6 replicas at 74% CPU and still climbing
-  maxReplicas: 12
+  # Proportional max: high-middle tier, highest QPS. CPU req raised to compensate fewer pods
+  maxReplicas: 5
   metrics:
   - type: Resource
     resource:
