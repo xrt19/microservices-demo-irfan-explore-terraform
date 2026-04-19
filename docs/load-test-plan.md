@@ -134,7 +134,20 @@ Expected behavior:
 | 2 — Moderate | 40 | 3 | 2026-04-19 03:45 WIB | Done |
 | 3 — Stress | 100 | 5 | 2026-04-19 03:56 WIB | Done |
 | 4 — Max Capacity | 150 | 10 | 2026-04-19 04:28 WIB | Done |
-| 5 — Even Load Retest | 100 | 10 | 2026-04-19 04:51 WIB | Running |
+| 5 — Even Load Retest | 100 | 10 | 2026-04-19 04:51 WIB | Done |
+| 6 — Push Limits | 200 | 10 | 2026-04-19 05:19 WIB | Done |
+| 7 — Push Limits v2 | 200 | 20 | 2026-04-19 05:29 WIB | Running |
+
+**Scenario 7 HPA check (sampled ~10:42 WIB):**
+Node CPU 34-37%, still 3 nodes. Frontend at 14/15 replicas (66% CPU) — nearly maxed again.
+Other services scaling within range: currencyservice 7/12 (69%), productcatalogservice 6/10 (70%),
+recommendationservice 6/10 (68%), cartservice 3/7 (44%). Only frontend adjusted: 15→20.
+Other services have enough max headroom to auto-scale without hitting ceiling.
+
+**Scenario 6 → 7 HPA adjustments (sampled ~05:28 WIB):**
+At USERS=200 RATE=10, frontend maxed at 10 replicas (88% CPU). Raised HPA max:
+- frontend: 10→15, currencyservice: 10→12, productcatalogservice: 8→10, recommendationservice: 8→10.
+Node CPU at 30-38% — still has capacity. RATE bumped to 20 for faster ramp-up.
 
 **Scenario 5 config change:** Loadgenerator scaled to 3 replicas (1 per zone) with topology
 spread constraints and PDB to fix uneven load distribution observed in Scenarios 3-4.

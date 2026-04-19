@@ -112,8 +112,8 @@ spec:
     kind: Deployment
     name: productcatalogservice
   minReplicas: 3
-  # Raised from 5: hit 72% CPU at 3 replicas under USERS=100 RATE=10
-  maxReplicas: 8
+  # Raised from 5→8→10: at USERS=200 RATE=10, 6 replicas at 65% CPU approaching threshold
+  maxReplicas: 10
   metrics:
   - type: Resource
     resource:
