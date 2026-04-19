@@ -92,12 +92,13 @@ spec:
           value: "200"
         - name: RATE
           value: "20"
+        # CPU tuned: actual avg 78m at USERS=200, was over-provisioned at 300m (26% efficiency). Ratio 1:2.5
         resources:
           requests:
-            cpu: 300m
+            cpu: 100m
             memory: 256Mi
           limits:
-            cpu: 500m
+            cpu: 250m
             memory: 512Mi
 # ---
 # Locust Web UI Service

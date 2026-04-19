@@ -66,12 +66,13 @@ spec:
           periodSeconds: 5
           grpc:
             port: 8080
+        # CPU tuned: actual peak 13m at USERS=200, was over-provisioned at 100m (6% efficiency). Ratio 1:2.5
         resources:
           requests:
-            cpu: 100m
+            cpu: 30m
             memory: 64Mi
           limits:
-            cpu: 200m
+            cpu: 75m
             memory: 128Mi
 ---
 apiVersion: v1

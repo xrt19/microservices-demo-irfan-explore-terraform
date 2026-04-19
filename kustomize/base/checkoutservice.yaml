@@ -73,12 +73,13 @@ spec:
             value: "currencyservice:7000"
           - name: CART_SERVICE_ADDR
             value: "cartservice:7070"
+          # CPU tuned: actual peak 27m at USERS=200, was over-provisioned at 100m (14% efficiency). Ratio 1:2.5
           resources:
             requests:
-              cpu: 100m
+              cpu: 50m
               memory: 64Mi
             limits:
-              cpu: 200m
+              cpu: 125m
               memory: 128Mi
 ---
 apiVersion: v1

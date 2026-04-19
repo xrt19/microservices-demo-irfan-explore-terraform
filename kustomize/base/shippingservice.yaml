@@ -64,12 +64,13 @@ spec:
         livenessProbe:
           grpc:
             port: 50051
+        # CPU tuned: actual peak 13m at USERS=200, was over-provisioned at 100m (12% efficiency). Ratio 1:2.5
         resources:
           requests:
-            cpu: 100m
+            cpu: 30m
             memory: 64Mi
           limits:
-            cpu: 200m
+            cpu: 75m
             memory: 128Mi
 ---
 apiVersion: v1
@@ -112,7 +113,8 @@ spec:
     kind: Deployment
     name: shippingservice
   minReplicas: 3
-  maxReplicas: 5
+  # Raised from 5→7: CPU request lowered (100m→30m) makes HPA % more sensitive, at 40% already
+  maxReplicas: 7
   metrics:
   - type: Resource
     resource:

@@ -56,12 +56,13 @@ spec:
         env:
         - name: PORT
           value: "9555"
+        # CPU tuned: actual peak 47m at USERS=200, was over-provisioned at 200m (14% efficiency). Ratio 1:2.5
         resources:
           requests:
-            cpu: 200m
+            cpu: 100m
             memory: 180Mi
           limits:
-            cpu: 300m
+            cpu: 250m
             memory: 300Mi
         readinessProbe:
           initialDelaySeconds: 20
@@ -114,7 +115,8 @@ spec:
     kind: Deployment
     name: adservice
   minReplicas: 3
-  maxReplicas: 5
+  # Raised from 5→8: CPU request halved (200m→100m) makes HPA % more sensitive, maxed at 5 immediately
+  maxReplicas: 8
   metrics:
   - type: Resource
     resource:

@@ -152,6 +152,47 @@ Node CPU at 30-38% — still has capacity. RATE bumped to 20 for faster ramp-up.
 **Scenario 5 config change:** Loadgenerator scaled to 3 replicas (1 per zone) with topology
 spread constraints and PDB to fix uneven load distribution observed in Scenarios 3-4.
 
+### Resource Efficiency Tuning (applied ~11:02 WIB)
+
+Reduced CPU requests/limits for over-provisioned services based on actual usage at USERS=200.
+Ratio 1:2.5 (request:limit) applied to all tuned services.
+
+| Service | Old Req→Limit | New Req→Limit | Actual Peak | Efficiency Before |
+|---------|:------------:|:------------:|:-----------:|:-----------------:|
+| checkoutservice | 100m→200m | 50m→125m | 27m | 14% |
+| adservice | 200m→300m | 100m→250m | 47m | 14% |
+| shippingservice | 100m→200m | 30m→75m | 13m | 12% |
+| emailservice | 100m→200m | 30m→75m | 13m | 6% |
+| paymentservice | 100m→200m | 30m→75m | 6m | 3% |
+| loadgenerator | 300m→500m | 100m→250m | 86m | 26% |
+
+**Estimated CPU requests freed:** ~1,200m across 3 nodes — allows more HPA scaling headroom.
+
+#### Data Capture: T+0 (11:02 WIB, right after apply)
+
+**Nodes:**
+
+| Node | CPU Used | CPU% | Mem% |
+|------|----------|:----:|:----:|
+| zss3 | 1,326m | 33% | 43% |
+| svf2 | 1,571m | 40% | 49% |
+| 20hq | 1,390m | 35% | 46% |
+
+**HPA:**
+
+| Service | CPU% | Replicas |
+|---------|:----:|:--------:|
+| frontend | 69% | 14 |
+| currencyservice | 72% | 7 |
+| recommendationservice | 71% | 6 |
+| productcatalogservice | 70% | 6 |
+| cartservice | 46% | 3 |
+| adservice | 15% | 3 |
+| checkoutservice | 15% | 3 |
+| shippingservice | 12% | 3 |
+| emailservice | 6% | 3 |
+| paymentservice | 3% | 3 |
+
 ### Scenario 1 Notes (sampled ~03:45 WIB)
 
 **Node Utilization:**
